@@ -59,8 +59,7 @@ export const FileUpload = ({
   });
 
   const uploadFileToAzure = async (file: File) => {
-    const sasToken =
-      "sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupyx&se=2026-07-30T21:28:11Z&st=2024-10-14T13:28:11Z&spr=https,http&sig=I5wVuflV5VGIdFpqhtwFYPKNOsn1Gsss44sG9J074is%3D";
+    const sasToken = process.env.NEXT_PUBLIC_AZURE_SAS_TOKEN;
     const blobServiceClient = new BlobServiceClient(
       `https://talkwithdocuments.blob.core.windows.net?${sasToken}`
     );
