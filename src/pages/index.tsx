@@ -1,14 +1,28 @@
 import { FileUpload } from "../components/ui/file-upload";
 import React from 'react';
 import { BackgroundLines } from "../components/ui/background-lines";
+import { TypewriterEffectSmooth } from "../components/ui/typewriter-effect";
+
 
 function index() {
-  // const words = ["better", "cute", "beautiful", "modern"];
-
+  const words = [
+    {
+      text: "Talk",
+    },
+    {
+      text: "With",
+    },
+    {
+      text: "Documents",
+      className: "text-blue-500 dark:text-blue-500",
+    },
+  ];
   return (
     <>
       <div className="h-[40rem] flex flex-col md:flex-row justify-center items-center px-4">
         <BackgroundLines className="flex items-center justify-center w-full flex-col px-4">
+          {" "}
+          <TypewriterEffectSmooth words={words} />
           <h2 className="bg-clip-text text-transparent text-center bg-gradient-to-b from-neutral-900 to-neutral-700 dark:from-neutral-600 dark:to-white text-2xl md:text-4xl lg:text-7xl font-sans py-2 md:py-10 relative z-20 font-bold tracking-tight">
             Talk To Your Files <br /> Any Time , Any Where
           </h2>
