@@ -2,8 +2,12 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { FloatingDock } from "./floating-dock";
+import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
+
 
 export default function LampDemo() {
+  
   return (
     <LampContainer>
       <motion.h1
@@ -29,6 +33,23 @@ export const LampContainer = ({
   children: React.ReactNode;
   className?: string;
 }) => {
+  const links = [
+    {
+      title: "WaitList",
+      icon: <IconLayoutNavbarCollapse />,
+      href: "/waitlist",
+    },
+    {
+      title: "About",
+      icon: <IconLayoutNavbarCollapse />,
+      href: "/about",
+    },
+    {
+      title: "Github",
+      icon: <IconLayoutNavbarCollapse />,
+      href: "/contact",
+    },
+  ];
   return (
     <div
       className={cn(
@@ -99,6 +120,8 @@ export const LampContainer = ({
       <div className="relative z-50 flex -translate-y-80 flex-col items-center px-5">
         {children}
       </div>
+      <FloatingDock mobileClassName="translate-y-20" // only for demo, remove for production
+        items={links}/>
     </div>
   );
 };
