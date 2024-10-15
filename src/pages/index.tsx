@@ -5,7 +5,6 @@ import { TypewriterEffectSmooth } from "../components/ui/typewriter-effect";
 import { LampContainer } from "@/components/ui/lamp";
 import { motion } from "framer-motion";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
-// import { GoogleGeminiEffect } from "@/components/ui/google-gemini-effect";
 import { useTransform, useScroll } from "framer-motion";
 
 
@@ -44,12 +43,6 @@ const words = [
   ];
   const word = `
   Tired of searching through endless documents? & Bored of typing to get answers?`;
-
- const pathLengthFirst = useTransform(scrollYProgress, [0, 0.8], [0.2, 1.2]);
- const pathLengthSecond = useTransform(scrollYProgress, [0, 0.8], [0.15, 1.2]);
- const pathLengthThird = useTransform(scrollYProgress, [0, 0.8], [0.1, 1.2]);
- const pathLengthFourth = useTransform(scrollYProgress, [0, 0.8], [0.05, 1.2]);
- const pathLengthFifth = useTransform(scrollYProgress, [0, 0.8], [0, 1.2]);
   return (
     <>
       <div className="h-[40rem] flex flex-col md:flex-row justify-center items-center px-4">
@@ -71,15 +64,7 @@ const words = [
       </div>
       <TextGenerateEffect words={word} />
       {/* <br /> <TextGenerateEffect words={word2} /> */}
-      {/* <GoogleGeminiEffect
-        pathLengths={[
-          pathLengthFirst,
-          pathLengthSecond,
-          pathLengthThird,
-          pathLengthFourth,
-          pathLengthFifth,
-        ]}
-      /> */}
+    
       <div className="flex flex-col items-center justify-center h-[40rem]  ">
         <p className="text-neutral-600 dark:text-neutral-200 text-xs sm:text-base  ">
           The road to freedom starts from here
@@ -98,7 +83,6 @@ const words = [
           </button>
         </div>
       </div>
-      {/* hiiii */}
       <LampContainer>
         <motion.h1
           initial={{ opacity: 0.5, y: 100 }}
