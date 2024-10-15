@@ -51,11 +51,11 @@ export const TextGenerateEffect = ({
   };
 
   return (
-    <div className={cn("font-bold", className)}>
+    <div className={cn("font-bold", className, "flex justify-center items-center h-full")}>
       <div className="mt-4">
-        <div className=" dark:text-white text-black text-2xl leading-snug tracking-wide">
-          {renderWords()}
-        </div>
+      <div className="dark:text-white text-black text-4xl leading-snug tracking-wide text-center">
+        {renderWords()}
+      </div>
       </div>
     </div>
   );
