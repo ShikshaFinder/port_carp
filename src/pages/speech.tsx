@@ -1,12 +1,11 @@
-// /pages/index.js
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function Home() {
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [error, setError] = useState("");
 
-  let mediaRecorder: MediaRecorder;
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const startRecording = async () => {
     setIsRecording(true);
@@ -16,9 +15,10 @@ export default function Home() {
     try {
       // Request access to the user's microphone
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder = new MediaRecorder(stream);
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
 
-      const audioChunks: BlobPart[] | undefined = [];
+      const audioChunks: BlobPart[] = [];
 
       mediaRecorder.ondataavailable = (event) => {
         audioChunks.push(event.data);
@@ -30,10 +30,13 @@ export default function Home() {
 
         reader.readAsDataURL(audioBlob);
         reader.onloadend = async () => {
-          const base64AudioMessage = typeof reader.result === "string" ? reader.result.split(",")[1] : "";
+          const base64AudioMessage =
+            typeof reader.result === "string"
+              ? reader.result.split(",")[1]
+              : "";
 
           // Send audio data to API route
-          const response = await fetch("/api/speech-to-text", {
+          const response = await fetch("/api/speechtotext.ts", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -60,7 +63,9 @@ export default function Home() {
 
   const stopRecording = () => {
     setIsRecording(false);
-    mediaRecorder.stop();
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+    }
   };
 
   return (
