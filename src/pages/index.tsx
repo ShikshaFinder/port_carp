@@ -6,7 +6,9 @@ import { LampContainer } from "@/components/ui/lamp";
 import { motion } from "framer-motion";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { useTransform, useScroll } from "framer-motion";
-
+import { useState } from "react";
+import { Button } from "@/components/ui/moving-border";
+import supabase from "../../supabase";
 
 function index() {
   const wordz = [
@@ -22,14 +24,35 @@ function index() {
     },
   ];
 
-  
-const ref = React.useRef(null);
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState("");
 
-const { scrollYProgress } = useScroll({
-  target: ref,
-  offset: ["start start", "end start"],
-}); 
-const words = [
+  const handleEmailSubmit = async () => {
+    if (!email) {
+      setStatus("Please enter an email.");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("emailtalkwithdoc")
+      .insert([{ email }]);
+
+    if (error) {
+      setStatus("Error submitting email.");
+      console.error(error);
+    } else {
+      setStatus("Email added successfully!");
+      setEmail("");
+    }
+  };
+
+  const ref = React.useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"],
+  });
+  const words = [
     {
       text: "Talk",
     },
@@ -63,26 +86,32 @@ const words = [
         </div>
       </div>
       <TextGenerateEffect words={word} />
-      {/* <br /> <TextGenerateEffect words={word2} /> */}
-    
-      <div className="flex flex-col items-center justify-center h-[40rem]  ">
-        <p className="text-neutral-600 dark:text-neutral-200 text-xs sm:text-base  ">
-          The road to freedom starts from here
+      <div className="flex flex-col items-center justify-center h-[40rem]">
+        <p className="text-neutral-600 dark:text-neutral-200 text-xs sm:text-base">
+          Let's Connect & build something great together
         </p>
         <TypewriterEffectSmooth words={wordz} />
         <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 space-x-0 md:space-x-4">
           <input
             type="text"
             placeholder="hello@gmail.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="rounded-lg border border-neutral-800 focus:ring-2 focus:ring-teal-500 w-full relative z-10 mt-4 bg-neutral-50 placeholder:text-neutral-700 p-3"
           />
-        </div><br />
-        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 space-x-0 md:space-x-4">
-          <button className="w-40 h-10 rounded-xl bg-black border dark:border-white border-transparent text-white text-sm">
-            Join now
-          </button>
         </div>
+        <br />
+        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 space-x-0 md:space-x-4">
+          <Button
+            className="w-40 h-10 rounded-xl bg-black border dark:border-white border-transparent text-white text-sm"
+            onClick={handleEmailSubmit}
+          >
+            Connect Now
+          </Button>
+        </div>
+        {status && <p className="mt-2 text-sm text-gray-500">{status}</p>}
       </div>
+
       <LampContainer>
         <motion.h1
           initial={{ opacity: 0.5, y: 100 }}

@@ -1,79 +1,77 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 
-export default function SpeechToText() {
-  const [isRecording, setIsRecording] = useState(false);
-  const [transcript, setTranscript] = useState("");
+export default function UploadAudio() {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [transcription, setTranscription] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
-  const startRecording = async () => {
-    setIsRecording(true);
-    setTranscript("");
-    setError("");
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-
-      const audioChunks: Blob[] = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        audioChunks.push(event.data);
-      };
-
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-        const arrayBuffer = await audioBlob.arrayBuffer();
-
-        // Convert arrayBuffer to Uint8Array
-        const audioData = new Uint8Array(arrayBuffer);
-
-        // Send the audio data to the backend API
-        const response = await fetch("/api/speechtotext", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ audioData: Array.from(audioData) }), // Send Uint8Array as JSON array
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          setTranscript(result.text);
-        } else {
-          setError("Speech recognition failed. Please try again.");
-        }
-      };
-
-      mediaRecorder.start();
-    } catch (err) {
-      console.error(err);
-      setError("Error accessing the microphone");
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFile(e.target.files[0]);
     }
   };
 
-  const stopRecording = () => {
-    setIsRecording(false);
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!selectedFile) {
+      setError("Please select an audio file to upload.");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+    setTranscription("");
+
+    try {
+      const fileArrayBuffer = await selectedFile.arrayBuffer();
+      const audioData = Array.from(new Uint8Array(fileArrayBuffer));
+
+      const response = await fetch("/api/speechtotext", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ audioData }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setTranscription(data.text);
+      } else {
+        setError(
+          data.error || "An error occurred while transcribing the audio."
+        );
+      }
+    } catch (err) {
+      setError("An error occurred while uploading the audio file.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>Speech to Text Converter</h1>
-      <button onClick={isRecording ? stopRecording : startRecording}>
-        {isRecording ? "Stop Recording" : "Start Recording"}
-      </button>
-      {transcript && (
-        <div style={{ marginTop: "20px" }}>
-          <h3>Transcript:</h3>
-          <p>{transcript}</p>
+    <div>
+      <h1>Upload Audio for Speech-to-Text</h1>
+
+      <form onSubmit={handleSubmit}>
+        <input type="file" accept="audio/*" onChange={handleFileChange} />
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Processing..." : "Upload and Transcribe"}
+        </button>
+      </form>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {transcription && (
+        <div>
+          <h2>Transcription</h2>
+          <p>{transcription}</p>
         </div>
       )}
-      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import {
   SpeechRecognizer,
 } from "microsoft-cognitiveservices-speech-sdk";
 
-export default async function handler(req, res) {
+export default async function handler(req: { method: string; body: { audioData: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { text?: any; error?: string; message?: string; }): void; new(): any; }; }; }) {
   if (req.method === "POST") {
     try {
       const { audioData } = req.body;
@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         throw new Error("Invalid audio data");
       }
 
-      // Set up Azure Speech credentials
+      // Set up Azure Speech credentials from environment variables
       const subscriptionKey = process.env.AZURE_SPEECH_KEY;
       const region = process.env.AZURE_SPEECH_REGION;
       const endpoint = process.env.AZURE_SPEECH_ENDPOINT;
@@ -44,25 +44,27 @@ export default async function handler(req, res) {
       // Recognize speech asynchronously
       const result = await new Promise((resolve, reject) => {
         recognizer.recognizeOnceAsync(
-          (recognitionResult) => resolve(recognitionResult),
+          (recognitionResult) => resolve(recognitionResult as any),
           (error) => reject(error)
         );
       });
 
       // Check the result of the recognition
-      if (result && result.reason === 0) {
+      if (result && (result as any).reason === 0) {
         // Success
-        res.status(200).json({ text: result.text });
+        res.status(200).json({ text: result });
       } else {
         res
           .status(500)
-          .json({ error: "Speech recognition failed: " + result.reason });
+          .json({ error: "Speech recognition failed: " + result });
       }
     } catch (error) {
       console.error(error);
       res
         .status(500)
-        .json({ error: "Error processing the audio: " + (error as Error).message });
+        .json({
+          error: "Error processing the audio: " + (error as Error).message,
+        });
     }
   } else {
     res.status(405).json({ message: "Method Not Allowed" });
