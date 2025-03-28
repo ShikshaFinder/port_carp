@@ -52,7 +52,7 @@ const services = [
   },
   {
     id: 3,
-    title: "Sofa Collection",
+    title: "Sofa Collections",
     category: "sofa",
     image: "/images/img3.jpg",
     description: "Premium sofa designs",
